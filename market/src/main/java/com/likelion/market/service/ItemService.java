@@ -89,8 +89,9 @@ public class ItemService {
 
         if (optionalItemEntity.isPresent()) {
             ItemEntity target = optionalItemEntity.get();
+            // 등록한 유저가 일치하면 삭제하기
             // 비밀번호가 일치하면 삭제하기
-            if (target.getPassword().equals(dto.getPassword())) repository.deleteById(id);
+            if (target.getWriter().equals(dto.getWriter()) && target.getPassword().equals(dto.getPassword())) repository.deleteById(id);
             else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
