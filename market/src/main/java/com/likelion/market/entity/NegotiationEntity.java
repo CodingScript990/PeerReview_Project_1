@@ -12,10 +12,9 @@ public class NegotiationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long itemId;
+    private Long suggestedPrice;
 
-    private Integer itemId;
-    private Integer suggestedPrice;
-    @ColumnDefault("")
     private String status;
     private String writer;
     @JsonIgnore
