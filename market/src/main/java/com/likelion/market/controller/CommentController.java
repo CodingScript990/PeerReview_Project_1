@@ -19,8 +19,8 @@ public class CommentController {
     // POST /items/{itemId}/comments => 200[OK]
     @PostMapping
     public ResponseDto commentCreate(@PathVariable("itemId") Long itemId, @RequestBody
-    CommentDto dto) {
-        commentService.createComment(itemId, dto);
+    CommentDto commentDto) {
+        commentService.createComment(itemId, commentDto);
         ResponseDto response = new ResponseDto();
         response.setMessage("댓글이 등록되었습니다.");
         return response;
@@ -34,8 +34,8 @@ public class CommentController {
 
     // PUT /items/{itemId}/comments/{commentId} => 200[OK]
     @PutMapping("/{commentId}")
-    public ResponseDto commentUpdate(@PathVariable("itemId") Long itemId, @PathVariable("commentId") Long commentId, @RequestBody CommentDto dto) {
-        commentService.updateComment(itemId, commentId, dto);
+    public ResponseDto commentUpdate(@PathVariable("itemId") Long itemId, @PathVariable("commentId") Long commentId, @RequestBody CommentDto commentDto) {
+        commentService.updateComment(itemId, commentId, commentDto);
         ResponseDto response = new ResponseDto();
         response.setMessage("댓글이 수정되었습니다.");
         return response;
@@ -43,8 +43,8 @@ public class CommentController {
 
     // PUT /items/{itemId}/comments/{commentId}/reply => 200[OK]
     @PutMapping("/{commentId}/reply")
-    public ResponseDto commentReply(@PathVariable("itemId") Long itemId, @PathVariable("commentId") Long commentId, @RequestBody CommentDto dto) {
-        commentService.updateReplyComment(itemId, commentId, dto);
+    public ResponseDto commentReply(@PathVariable("itemId") Long itemId, @PathVariable("commentId") Long commentId, @RequestBody CommentDto commentDto) {
+        commentService.updateReplyComment(itemId, commentId, commentDto);
         ResponseDto response = new ResponseDto();
         response.setMessage("댓글에 답변이 추가되었습니다.");
         return response;
@@ -52,8 +52,8 @@ public class CommentController {
 
     // DELETE /items/{itemId}/comments/{commentId} => 200[OK]
     @DeleteMapping("/{commentId}")
-    public ResponseDto commentDelete(@PathVariable("itemId") Long itemId, @PathVariable("commentId") Long commentId, @RequestBody CommentDto dto) {
-        commentService.deleteComment(itemId, commentId, dto);
+    public ResponseDto commentDelete(@PathVariable("itemId") Long itemId, @PathVariable("commentId") Long commentId, @RequestBody CommentDto commentDto) {
+        commentService.deleteComment(itemId, commentId, commentDto);
         ResponseDto response = new ResponseDto();
         response.setMessage("댓글을 삭제했습니다.");
         return response;

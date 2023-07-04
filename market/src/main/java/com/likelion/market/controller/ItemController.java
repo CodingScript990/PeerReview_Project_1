@@ -6,7 +6,9 @@ import com.likelion.market.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -39,17 +41,17 @@ public class ItemController {
 
     // PUT /items/{itemId}
     @PutMapping("/{itemId}")
-    public ResponseDto update(@PathVariable("itemId") Long id, @RequestBody ItemDto dto) {
-        service.updateItem(id, dto);
+    public ResponseDto update(@PathVariable("itemId") Long id, @RequestBody ItemDto itemDto) {
+        service.updateItem(id, itemDto);
         ResponseDto response = new ResponseDto();
         response.setMessage("물품이 수정되었습니다.");
         return response;
     }
 
     // PUT /items/{itemId}/image
-    @PutMapping( "/{itemId}/image")
-    public ResponseDto updateImage(@PathVariable("itemId") Long id, @RequestBody ItemDto dto) {
-        service.updateUserImage(id, dto);
+    @PutMapping(value = "/{itemId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseDto updateImage(@PathVariable("itemId") Long id, @RequestParam("image")MultipartFile image, @RequestParam("writer") String writer, @RequestParam("password") String password) {
+        service.updateUserImage(id, image, writer, password);
         ResponseDto response = new ResponseDto();
         response.setMessage("이미지 등록이 완료되었습니다.");
         return response;
@@ -57,8 +59,8 @@ public class ItemController {
 
     // DELETE /items/{itemId}
     @DeleteMapping("/{itemId}")
-    public ResponseDto delete(@PathVariable("itemId") Long id, @RequestBody ItemDto dto) {
-        service.deleteItem(id, dto);
+    public ResponseDto delete(@PathVariable("itemId") Long id, @RequestBody ItemDto itemDto) {
+        service.deleteItem(id, itemDto);
         ResponseDto response = new ResponseDto();
         response.setMessage("물품을 삭제했습니다.");
         return response;
