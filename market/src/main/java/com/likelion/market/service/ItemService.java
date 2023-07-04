@@ -11,8 +11,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -68,19 +77,44 @@ public class ItemService {
     }
 
     // Update => Image
-    public ItemDto updateUserImage(Long id, ItemDto dto) {
-        Optional<ItemEntity> imageItem = repository.findById(id);
-        if (imageItem.isPresent()) {
-            ItemEntity target = imageItem.get();
+    public ItemDto updateUserImage(Long id, MultipartFile image, String writer, String password) {
+        Optional<ItemEntity> optionalItem = repository.findById(id);
 
-            // 비밀번호가 일치하면 수정하기
-            if (target.getPassword().equals(dto.getPassword())) {
-                target.setImageUrl(dto.getImageUrl());
-                return ItemDto.fromEntity(repository.save(target));
-            }
-            else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if(optionalItem.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        ItemEntity entity = optionalItem.get();
+
+        if(!entity.getWriter().equals(writer))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if(!entity.getPassword().equals(password))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+        String extension = "." + image.getOriginalFilename().split("\\.")[1];
+        String imageDir = String.format("./item-images/%d", id);
+        String filename = String.format("item_%d_%s", id, LocalDateTime.now().toString().replace(":",""));
+        String itemImageName = filename + extension;
+
+        try {
+            Files.createDirectories(Paths.get(imageDir));
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        File file = new File(Path.of(imageDir, itemImageName).toUri());
+
+        try (OutputStream outputStream = new FileOutputStream(file)){
+            outputStream.write(image.getBytes());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        String imageUrl = String.format("/static/%d/%s", id, itemImageName);
+        entity.setImageUrl(imageUrl);
+
+        return ItemDto.fromEntity(repository.save(entity));
     }
 
     // Delete

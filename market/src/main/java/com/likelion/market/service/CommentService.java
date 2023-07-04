@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +25,16 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     // POST /items/{itemId}/comments
-    public CommentDto createComment(Long itemId, CommentDto dto) {
+    public CommentDto createComment(Long itemId, CommentDto commentDto) {
 
         if (!itemRepository.existsById(itemId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         CommentEntity newComment = new CommentEntity();
 
         newComment.setItemId(itemId);// 대상 물품
-        newComment.setContent(dto.getContent()); // 댓글 내용
-        newComment.setWriter(dto.getWriter()); // 작성자
-        newComment.setPassword(dto.getPassword()); // 비밀번호
+        newComment.setContent(commentDto.getContent()); // 댓글 내용
+        newComment.setWriter(commentDto.getWriter()); // 작성자
+        newComment.setPassword(commentDto.getPassword()); // 비밀번호
 
         log.info(String.valueOf(newComment));
 
@@ -50,18 +49,18 @@ public class CommentService {
     }
 
     // PUT /items/{itemId}/comments/{commentId}
-    public CommentDto updateComment(Long itemId, Long commentId, CommentDto dto) {
+    public CommentDto updateComment(Long itemId, Long commentId, CommentDto commentDto) {
         Optional<CommentEntity> updateComment = commentRepository.findById(commentId);
 
         // 댓글이 존재하는지를 확인하기!
         if (!itemRepository.existsById(itemId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         // 댓글이 존재하면 비밀번호를 체크하기!
-        if (!dto.getPassword().equals(updateComment.get().getPassword())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!commentDto.getPassword().equals(updateComment.get().getPassword())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         CommentEntity target = updateComment.get();
 
-        target.setContent(dto.getContent());
+        target.setContent(commentDto.getContent());
 
         commentRepository.save(target);
 
@@ -69,18 +68,18 @@ public class CommentService {
     }
 
     // PUT /items/{itemId}/comments/{commentId}/reply
-    public CommentDto updateReplyComment(Long itemId, Long commentId, CommentDto dto) {
+    public CommentDto updateReplyComment(Long itemId, Long commentId, CommentDto commentDto) {
         Optional<CommentEntity> replyComment = commentRepository.findById(commentId);
 
         if (!itemRepository.existsById(itemId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         Optional<ItemEntity> inspectItem = itemRepository.findById(replyComment.get().getItemId());
 
-        if (!dto.getPassword().equals(inspectItem.get().getPassword())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!commentDto.getPassword().equals(inspectItem.get().getPassword())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         CommentEntity target = replyComment.get();
 
-        target.setReply(dto.getReply());
+        target.setReply(commentDto.getReply());
 
         commentRepository.save(target);
 
@@ -88,12 +87,12 @@ public class CommentService {
     }
 
     // DELETE /items/{itemId}/comments/{commentId}
-    public void deleteComment(Long itemId, Long commentId, CommentDto dto) {
+    public void deleteComment(Long itemId, Long commentId, CommentDto commentDto) {
         Optional<CommentEntity> deleteEntity = commentRepository.findById(commentId);
 
         if (!itemRepository.existsById(itemId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
-        if (!dto.getPassword().equals(deleteEntity.get().getPassword())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!commentDto.getPassword().equals(deleteEntity.get().getPassword())) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         commentRepository.deleteById(commentId);
     }
