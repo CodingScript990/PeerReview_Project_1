@@ -50,7 +50,7 @@ public class ItemController {
 
     // PUT /items/{itemId}/image
     @PutMapping(value = "/{itemId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseDto updateImage(@PathVariable("itemId") Long id, @RequestParam("image")MultipartFile image, @RequestParam("writer") String writer, @RequestParam("password") String password) {
+    public ResponseDto updateImage(@PathVariable("itemId") Long id, @RequestParam("image") MultipartFile image, @RequestParam("writer") String writer, @RequestParam("password") String password) {
         service.updateUserImage(id, image, writer, password);
         ResponseDto response = new ResponseDto();
         response.setMessage("이미지 등록이 완료되었습니다.");

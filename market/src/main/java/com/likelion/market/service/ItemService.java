@@ -79,42 +79,35 @@ public class ItemService {
     // Update => Image
     public ItemDto updateUserImage(Long id, MultipartFile image, String writer, String password) {
         Optional<ItemEntity> optionalItem = repository.findById(id);
-
-        if(optionalItem.isEmpty())
+        if (optionalItem.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
-        ItemEntity entity = optionalItem.get();
+        ItemEntity item = optionalItem.get();
+        if (item.getWriter().equals(writer) && item.getPassword().equals(password)) {
+            String profileDir = String.format("media/%d/", id);
+            try {
+                Files.createDirectories(Path.of(profileDir));
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
 
-        if(!entity.getWriter().equals(writer))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        if(!entity.getPassword().equals(password))
+            String originalFilename = image.getOriginalFilename();
+            String[] fileNameSplit = originalFilename.split("\\."); //정규표현식을 기준으로 split
+            String extension = fileNameSplit[fileNameSplit.length-1]; //split 제일 마지막이 확장자
+            String profileFilename = "image." + extension;
+
+            String profilePath = profileDir + profileFilename;
+
+            try {
+                image.transferTo(Path.of(profilePath));
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+            ItemEntity ItemEntity = optionalItem.get();
+            ItemEntity.setImageUrl(String.format("/static/%d/%s", id, profileFilename));
+            return ItemDto.fromEntity(repository.save(ItemEntity));
+        } else
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-
-        String extension = "." + image.getOriginalFilename().split("\\.")[1];
-        String imageDir = String.format("./item-images/%d", id);
-        String filename = String.format("item_%d_%s", id, LocalDateTime.now().toString().replace(":",""));
-        String itemImageName = filename + extension;
-
-        try {
-            Files.createDirectories(Paths.get(imageDir));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        File file = new File(Path.of(imageDir, itemImageName).toUri());
-
-        try (OutputStream outputStream = new FileOutputStream(file)){
-            outputStream.write(image.getBytes());
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        String imageUrl = String.format("/static/%d/%s", id, itemImageName);
-        entity.setImageUrl(imageUrl);
-
-        return ItemDto.fromEntity(repository.save(entity));
     }
 
     // Delete

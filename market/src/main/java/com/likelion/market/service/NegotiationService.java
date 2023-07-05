@@ -126,7 +126,7 @@ public class NegotiationService {
         if (!negotiationEntity.getItemId().equals(itemId))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
-        // 구매제안 등록자의 작성자와 비밀번호 체크
+        // 구매제안 등록자, 작성자와 비밀번호 체크
         if (!negotiationEntity.getWriter().equals(dto.getWriter()) || !negotiationEntity.getPassword().equals(dto.getPassword()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
@@ -136,7 +136,6 @@ public class NegotiationService {
         // 제안상태 => "confirm"
         negotiationEntity.setStatus(dto.getStatus());
         NegotiationEntity confirmNegotiation = negotiationRepository.save(negotiationEntity);
-
 
         // itemId로 ItemEntity 값 불러오기
         Optional<ItemEntity> optionalItem = itemRepository.findById(itemId);

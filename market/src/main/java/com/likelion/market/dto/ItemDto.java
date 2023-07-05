@@ -11,7 +11,7 @@ public class ItemDto {
     private String title;
     private String description;
     private String imageUrl;
-    private Integer minPriceWanted;
+    private Long minPriceWanted;
     private String status;
     private String writer;
     private String password;
