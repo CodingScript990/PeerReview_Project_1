@@ -16,7 +16,6 @@ public class UserEntity {
     private String username; // ID
 
     private String password; // Password
-    private String rePassword; // Re-Password
 
     // 부수적인 부분
     private String email; // Email
