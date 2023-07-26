@@ -113,6 +113,7 @@ fabric.properties
 application.yaml
 .gradle
 .idea
+gradle
 db.sqlite
 media
 
