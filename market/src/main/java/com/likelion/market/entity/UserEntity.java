@@ -1,9 +1,11 @@
 package com.likelion.market.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -11,14 +13,16 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 필수 부분
     @Column(nullable = false, unique = true)
-    private String username; // ID
+    private String username;
+    @Column(nullable = false)
+    private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
+    @Column(nullable = false)
+    private String phone;
+    private String address;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    private String password; // Password
-
-    // 부수적인 부분
-    private String email; // Email
-    private String phone; // PhoneNumber
-    private String address; // Address
 }
